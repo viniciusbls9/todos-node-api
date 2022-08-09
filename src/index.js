@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 
-// const { v4: uuidv4 } = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 
@@ -44,11 +44,9 @@ app.post('/users', (request, response) => {
 app.get('/todos', checksExistsUserAccount, (request, response) => {
   const { username } = request.headers
 
-  const getTodos = users.find(user => user.username === username)
+  const getUserTodos = users.find(user => user.username === username)
 
-  getTodos.map(todo => {
-    return response.json(todo.todos)
-  })
+  return response.json(getUserTodos.todos)
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
