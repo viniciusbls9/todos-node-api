@@ -22,10 +22,18 @@ function checksExistsUserAccount(request, response, next) {
   return next()
 }
 
+function getUserInfos(username) {
+  const getUserInfos = users.find(user => user.username === username)
+
+  if (getUserInfos) return getUserInfos
+
+  return false
+}
+
 app.post('/users', (request, response) => {
   const { name, username } = request.body
 
-  const userAlreadyExists = users.some(user => user.username === username)
+  const userAlreadyExists = getUserInfos(username)
 
   if (userAlreadyExists) {
     return response.status(400).json({ error: 'User already exists!' })
@@ -44,7 +52,7 @@ app.post('/users', (request, response) => {
 app.get('/todos', checksExistsUserAccount, (request, response) => {
   const { username } = request.headers
 
-  const getUserTodos = users.find(user => user.username === username)
+  const getUserTodos = getUserInfos(username)
 
   return response.json(getUserTodos.todos)
 });
@@ -53,7 +61,7 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
   const { title, deadline } = request.body
   const { username } = request.headers
 
-  const getUserInfos = users.find(user => user.username === username)
+  const getUser = getUserInfos(username)
 
   const newTodo = {
     id: uuidv4(),
@@ -63,7 +71,7 @@ app.post('/todos', checksExistsUserAccount, (request, response) => {
     created_at: new Date()
   }
 
-  getUserInfos.todos.push(newTodo)
+  getUser.todos.push(newTodo)
 
   return response.status(201).json(newTodo)
 });
