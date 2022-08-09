@@ -1,11 +1,10 @@
 {
   "name": "todos-node-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/server.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon",
-    "test": "jest"
+    "dev": "nodemon"
   },
   "dependencies": {
     "cors": "^2.8.5",
