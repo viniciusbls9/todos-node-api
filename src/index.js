@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// const users = [];
+const users = [];
 
 function checksExistsUserAccount(request, response, next) {
   const { username } = request.headers
@@ -42,7 +42,13 @@ app.post('/users', (request, response) => {
 });
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
-  // Complete aqui
+  const { username } = request.headers
+
+  const getTodos = users.find(user => user.username === username)
+
+  getTodos.map(todo => {
+    return response.json(todo.todos)
+  })
 });
 
 app.post('/todos', checksExistsUserAccount, (request, response) => {
