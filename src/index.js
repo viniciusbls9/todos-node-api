@@ -24,18 +24,10 @@ function checksExistsUserAccount(request, response, next) {
   return next()
 }
 
-function getUserInfos(username) {
-  const getUserInfos = users.find(user => user.username === username)
-
-  if (getUserInfos) return getUserInfos
-
-  return false
-}
-
 app.post('/users', (request, response) => {
   const { name, username } = request.body
 
-  const userAlreadyExists = getUserInfos(username)
+  const userAlreadyExists = users.find(user => user.username === username)
 
   if (userAlreadyExists) {
     return response.status(400).json({ error: 'User already exists!' })
@@ -88,18 +80,16 @@ app.put('/todos/:id', checksExistsUserAccount, (request, response) => {
   }
 
   getTodoById.title = title
-  getTodoById.deadline = deadline
+  getTodoById.deadline = new Date(deadline)
 
-  return response.status(201).json(getTodoById)
+  return response.json(getTodoById)
 });
 
 app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
+  const { user } = request
   const { id } = request.params
-  const { username } = request.headers
 
-  const getUserTodos = getUserInfos(username)
-
-  const getTodoById = getUserTodos.todos.find(todo => todo.id === id)
+  const getTodoById = user.todos.find(todo => todo.id === id)
 
   if (!getTodoById) {
     return response.status(404).json({ error: 'Todo not found' })
@@ -111,14 +101,16 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
+  const { user } = request
   const { id } = request.query
-  const { username } = request.headers
 
-  const getUserTodos = getUserInfos(username)
+  const getTodoById = user.todos.find(todo => todo.id === id)
 
-  const getTodoById = getUserTodos.todos.find(todo => todo.id === id)
+  if (!getTodoById) {
+    return response.status(404).json({ error: 'Todo not found' })
+  }
 
-  getUserTodos.todos.splice(getTodoById, 1)
+  user.todos.splice(getTodoById, 1)
 
   return response.status(204).send()
 });
