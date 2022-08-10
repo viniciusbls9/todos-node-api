@@ -21,4 +21,23 @@ describe('Users', () => {
       todos: []
     });
   });
+
+  it('should not be able to create a new user when username already exists', async () => {
+    await request(app)
+      .post('/users')
+      .send({
+        name: 'John Doe',
+        username: 'johndoe'
+      });
+
+    const response = await request(app)
+      .post('/users')
+      .send({
+        name: 'John Doe',
+        username: 'johndoe'
+      })
+      .expect(400);
+
+    expect(response.body.error).toBeTruthy();
+  });
 });
