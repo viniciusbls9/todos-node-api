@@ -87,8 +87,6 @@ describe('Todos', () => {
       })
       .set('username', userResponse.body.username);
 
-    console.log(todoResponse.body.id)
-
     expect(response.body).toMatchObject({
       title: 'update title',
       deadline: todoDate.toISOString(),
@@ -108,5 +106,27 @@ describe('Todos', () => {
         deadline: todoDate.toISOString(),
         done: false
       });
+  });
+
+  it('should not be able to update a non existing todo', async () => {
+    const userResponse = await request(app)
+      .post('/users')
+      .send({
+        name: 'John Doe',
+        username: 'user8'
+      });
+
+    const todoDate = new Date();
+
+    const response = await request(app)
+      .put('/todos/invalid-todo-id')
+      .send({
+        title: 'update title',
+        deadline: todoDate
+      })
+      .set('username', userResponse.body.username)
+      .expect(404);
+
+    expect(response.body.error).toBeTruthy();
   });
 });
