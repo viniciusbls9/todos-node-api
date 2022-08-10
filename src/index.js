@@ -103,7 +103,7 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
 
   getTodoById.done = true
 
-  return response.status(201).send()
+  return response.status(201).json(getTodoById)
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
