@@ -157,4 +157,20 @@ describe('Todos', () => {
       done: true
     });
   });
+
+  it('should not be able to mark a non existing todo as done', async () => {
+    const userResponse = await request(app)
+      .post('/users')
+      .send({
+        name: 'John Doe',
+        username: 'user4'
+      });
+
+    const response = await request(app)
+      .patch('/todos/invalid-todo-id/done')
+      .set('username', userResponse.body.username)
+      .expect(404);
+
+    expect(response.body.error).toBeTruthy();
+  });
 });
