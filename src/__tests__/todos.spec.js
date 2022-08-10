@@ -173,4 +173,34 @@ describe('Todos', () => {
 
     expect(response.body.error).toBeTruthy();
   });
+
+  it('should be able to delete a todo', async () => {
+    const userResponse = await request(app)
+      .post('/users')
+      .send({
+        name: 'John Doe',
+        username: 'user5'
+      });
+
+    const todoDate = new Date();
+
+    const todo1Response = await request(app)
+      .post('/todos')
+      .send({
+        title: 'test todo',
+        deadline: todoDate
+      })
+      .set('username', userResponse.body.username);
+
+    await request(app)
+      .delete(`/todos/${todo1Response.body.id}`)
+      .set('username', userResponse.body.username)
+      .expect(204);
+
+    const listResponse = await request(app)
+      .get('/todos')
+      .set('username', userResponse.body.username);
+
+    expect(listResponse.body).toEqual([]);
+  });
 });
