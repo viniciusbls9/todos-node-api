@@ -129,4 +129,32 @@ describe('Todos', () => {
 
     expect(response.body.error).toBeTruthy();
   });
+
+  it('should be able to mark a todo as done', async () => {
+    const userResponse = await request(app)
+      .post('/users')
+      .send({
+        name: 'John Doe',
+        username: 'user3'
+      });
+
+    const todoDate = new Date();
+
+    const todoResponse = await request(app)
+      .post('/todos')
+      .send({
+        title: 'test todo',
+        deadline: todoDate
+      })
+      .set('username', userResponse.body.username);
+
+    const response = await request(app)
+      .patch(`/todos/${todoResponse.body.id}/done`)
+      .set('username', userResponse.body.username);
+
+    expect(response.body).toMatchObject({
+      ...todoResponse.body,
+      done: true
+    });
+  });
 });
