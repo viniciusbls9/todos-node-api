@@ -60,4 +60,53 @@ describe('Todos', () => {
     expect(validate(response.body.id)).toBe(true);
     expect(response.body.created_at).toBeTruthy();
   });
+
+  it('should be able to update a todo', async () => {
+    const userResponse = await request(app)
+      .post('/users')
+      .send({
+        name: 'John Doe',
+        username: 'user7'
+      });
+
+    const todoDate = new Date();
+
+    const todoResponse = await request(app)
+      .post('/todos')
+      .send({
+        title: 'test todo',
+        deadline: todoDate
+      })
+      .set('username', userResponse.body.username);
+
+    const response = await request(app)
+      .put(`/todos/${todoResponse.body.id}`)
+      .send({
+        title: 'update title',
+        deadline: todoDate
+      })
+      .set('username', userResponse.body.username);
+
+    console.log(todoResponse.body.id)
+
+    expect(response.body).toMatchObject({
+      title: 'update title',
+      deadline: todoDate.toISOString(),
+      done: false
+    });
+
+    const getAllTodosResponse = await request(app)
+      .get((`/todos/`))
+      .set('username', userResponse.body.username);
+
+    expect(
+      getAllTodosResponse.body.find(
+        (todo) => todo.id === todoResponse.body.id
+      ))
+      .toMatchObject({
+        title: 'update title',
+        deadline: todoDate.toISOString(),
+        done: false
+      });
+  });
 });
